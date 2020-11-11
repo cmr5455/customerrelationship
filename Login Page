@@ -1,52 +1,127 @@
 import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-	
-	public class customerLoginPage extends JFrame implements ActionListener {
-	   JPanel panel;
-	   JLabel user_label, password_label, message;
-	   JTextField userName_text;
-	   JPasswordField password_text;
-	   JButton submit, cancel;
-	   customerLoginPage() {
-	      // Username Label
-	      user_label = new JLabel();
-	      user_label.setText("User Name :");
-	      userName_text = new JTextField();
-	      // Password Label
-	      password_label = new JLabel();
-	      password_label.setText("Password :");
-	      password_text = new JPasswordField();
-	      // Submit
-	      submit = new JButton("SUBMIT");
-	      panel = new JPanel(new GridLayout(3, 1));
-	      panel.add(user_label);
-	      panel.add(userName_text);
-	      panel.add(password_label);
-	      panel.add(password_text);
-	      message = new JLabel();
-	      panel.add(message);
-	      panel.add(submit);
-	      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	      // Adding the listeners to components..
-	      submit.addActionListener(this);
-	      add(panel, BorderLayout.CENTER);
-	      setTitle("Please Login Here !");
-	      setSize(450,350);
-	      setVisible(true);
-	   }
-	   public static void main(String[] args) {
-	      new customerLoginPage();
-	   }
-	   @Override
-	   public void actionPerformed(ActionEvent ae) {
-	      String userName = userName_text.getText();
-	      String password = password_text.getText();
-	      if (userName.trim().equals("admin") && password.trim().equals("admin")) {
-	         message.setText(" Hello " + userName + "");
-	      } else {
-	         message.setText(" Invalid user.. ");
-	      }
-	   }
-	}
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+import java.sql.*;
+import java.io.Console;
+import java.util.Scanner;
+ 
+public class customerLoginPage extends JFrame implements ActionListener {
+    Container container = getContentPane();
+    JLabel userLabel = new JLabel("USERNAME");
+    JLabel passwordLabel = new JLabel("PASSWORD");
+    JTextField userTextField = new JTextField();
+    JPasswordField passwordField = new JPasswordField();
+    JButton loginButton = new JButton("LOGIN");
+    JButton resetButton = new JButton("CLEAR");
+    JCheckBox showPassword = new JCheckBox("Show Password");
+    customerLoginPage() {
+        setLayoutManager();
+        setLocationAndSize();
+        addComponentsToContainer();
+        addActionEvent();
+    }
+    public static Connection establish_connection(String database_name, String sql_username, String sql_passwd) 
+    {
+        Connection conn = null;
+        try {
+            
+            System.out.println("Establishing connection with MySql server on satoshi..");
+            conn = DriverManager.getConnection(
+            "jdbc:mysql://152.20.12.152/"+database_name+"?useLegacyDatetimeCode=false&serverTimezone=America/New_York"+"&noAccessToProcedureBodies=true"+"&useSSL=false"+"&user="+sql_username+"&password="+sql_passwd);
+            
+            System.out.println("Connection with MySql server on satoshi.cis.uncw.edu established.");
+        }
+        catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+            System.out.println("SQLState:     " + e.getSQLState());
+            System.out.println("VendorError:  " + e.getErrorCode());
+        }
+        
+        return conn;
+    }
+    public void setLayoutManager() {
+        container.setLayout(null);
+    }
+    public void setLocationAndSize() {
+        userLabel.setBounds(50, 150, 100, 30);
+        userLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        userLabel.setForeground(Color.BLUE);
+        passwordLabel.setBounds(50, 220, 100, 30);
+        passwordLabel.setForeground(Color.BLUE);
+        passwordLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        userTextField.setBounds(150, 150, 150, 30);
+        passwordField.setBounds(150, 220, 150, 30);
+        showPassword.setBounds(150, 250, 150, 30);
+        loginButton.setBounds(50, 300, 100, 30);
+        resetButton.setBounds(200, 300, 100, 30);
+    }
+    public void addComponentsToContainer() {
+        container.add(userLabel);
+        container.add(passwordLabel);
+        container.add(userTextField);
+        container.add(passwordField);
+        container.add(showPassword);
+        container.add(loginButton);
+        container.add(resetButton);
+    }
+    public void addActionEvent() {
+        loginButton.addActionListener(this);
+        resetButton.addActionListener(this);
+        showPassword.addActionListener(this);
+    }
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        //Coding Part of LOGIN button
+        if (e.getSource() == loginButton) {
+            String userText;
+            String pwdText;
+            userText = userTextField.getText();
+            pwdText = passwordField.getText();
+            
+            
+            if (userText.equalsIgnoreCase("user") && pwdText.equalsIgnoreCase("1234")) {
+                JOptionPane.showMessageDialog(this, "Login Successful");
+                
+            } else {
+            	
+                JOptionPane.showMessageDialog(this, "Invalid Username or Password");
+            }
+        }
+        //Coding Part of RESET button
+        if (e.getSource() == resetButton) {
+            userTextField.setText("");
+            passwordField.setText("");
+        }
+       //Coding Part of showPassword JCheckBox
+        if (e.getSource() == showPassword) {
+            if (showPassword.isSelected()) {
+                passwordField.setEchoChar((char) 0);
+            } else {
+                passwordField.setEchoChar('*');
+            }
+ 
+ 
+        }
+    }
+    public static void main(String[] a) {
+    	customerLoginPage frame = new customerLoginPage();
+        frame.setTitle("Please Login Here!");
+        frame.setVisible(true);
+        frame.setBounds(10, 10, 370, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+ 
+    }
+}
