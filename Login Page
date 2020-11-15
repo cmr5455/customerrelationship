@@ -52,39 +52,38 @@ public class customerLoginPage extends JFrame implements ActionListener {
         try {
         // Do something with the Connection
             Statement stmt = conn.createStatement();
+            Console c = System.console();
+          //Execute a query - which will return a result set
+            System.out.println("\n********Show Service Appointment*******\n");
+            ResultSet rset = stmt.executeQuery("SELECT * from Services, Reservations"); 
+            System.out.println("Service Types    |    Date    |   Time");
 
-            //Execute a query - which will return a result set
+            //Iterate over the result set and process each tuple
+            while (rset.next()) {
+                System.out.println(rset.getString("Name") + "\t" + rset.getString("Date") + rset.getString("Time"));
+            }
+            
+            System.out.println("\n********Update Employees Rate*******\n");
+            
+            System.out.println("Enter update percent raise for Rate update: ");
+            String rate = c.readLine();
+            rset = stmt.executeQuery("SELECT * from Employees"); 
+            //Iterate over the result set and process each tuple
             System.out.println("\n********Before Update*******\n");
-            ResultSet rset = stmt.executeQuery("SELECT * from Services");
-            
-            rset = stmt.executeQuery("SELECT * from Reservations");
-      
-
-            //Iterate over the result set and process each tuple
             while (rset.next()) {
-                    System.out.println(rset.getString("Name") + "\t" + rset.getString("Date") + rset.getString("Time"));
+                System.out.println(rset.getString("Employee_Name") + "\t" + rset.getString("Rate") + rset.getString("Hours")+rset.getString("Phone_Number")+rset.getString("Street")+rset.getString("Zip"));
             }
-
-            //Execute an update - nothing returned
-            //stmt.executeUpdate("update instructor set salary = salary*1.05;");
-            //System.out.println("\n********Salaries updated*******\n");
-            
-            //Execute a query - which will return a result set
+            System.out.println("\n********After Update*******\n");
+            stmt.executeUpdate("update Employees set Rate = Rate*1.05;");
             rset = stmt.executeQuery("SELECT * from Employees");
-
-            //Iterate over the result set and process each tuple
             while (rset.next()) {
-                    System.out.println(rset.getString(2) + "\t" + rset.getString("salary"));
+                System.out.println(rset.getString("Employee_Name") + "\t" + rset.getString("Rate") + rset.getString("Hours")+rset.getString("Phone_Number")+rset.getString("Street")+rset.getString("Zip"));
             }
-            
-   
-            
-          
-            
-            
             // Clean up
+            
             rset.close();
             stmt.close();
+            
             // Normally, you would close the connection when done
             // The connection is being left open in this example 
             // so that it does not have to re-established 
@@ -98,6 +97,25 @@ public class customerLoginPage extends JFrame implements ActionListener {
         }
     }
     private static void view(Connection conn) {
+    	try {
+    		Console c = System.console();
+            System.out.println("Service Listing Option");
+            Statement stmt = conn.createStatement();
+            ResultSet rset = stmt.executeQuery("SELECT * from Services");  
+            System.out.println("Service Types | Price | Minutes");
+
+            while (rset.next()) {
+                System.out.println(rset.getString(2) + "\t" + rset.getString(3)+"\t"+rset.getString(4));
+            }
+            rset.close();
+            stmt.close();
+    	}
+    	catch (SQLException e) {
+            System.out.println("SQLException: " + e.getMessage());
+            System.out.println("SQLState:     " + e.getSQLState());
+            System.out.println("VendorError:  " + e.getErrorCode());
+        }
+        
     	
     }
     private static void prepared_statement(Connection conn) {
@@ -172,7 +190,8 @@ public class customerLoginPage extends JFrame implements ActionListener {
         System.out.println("\t1. Use database");
         System.out.println("\t2. Prepared statement");
         System.out.println("\t3. Stored Procedure");
-        System.out.println("\t4. Exit");
+        System.out.println("\t4. View");
+        System.out.println("\t5. Exit");
         
         Scanner s = new Scanner(System.in);
         return s.nextInt();
@@ -279,6 +298,9 @@ public class customerLoginPage extends JFrame implements ActionListener {
                     call_stored_procedure(conn);
                     break;
                 case 4:
+                	view(conn);
+                	break;
+                case 5:
                     System.exit(0);
                     break;
             }
