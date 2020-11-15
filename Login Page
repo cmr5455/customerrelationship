@@ -55,24 +55,32 @@ public class customerLoginPage extends JFrame implements ActionListener {
 
             //Execute a query - which will return a result set
             System.out.println("\n********Before Update*******\n");
-            ResultSet rset = stmt.executeQuery("SELECT * from Instructor");
+            ResultSet rset = stmt.executeQuery("SELECT * from Services");
+            
+            rset = stmt.executeQuery("SELECT * from Reservations");
+      
 
             //Iterate over the result set and process each tuple
             while (rset.next()) {
-                    System.out.println(rset.getString(2) + "\t" + rset.getString("salary"));
+                    System.out.println(rset.getString("Name") + "\t" + rset.getString("Date") + rset.getString("Time"));
             }
 
             //Execute an update - nothing returned
-            stmt.executeUpdate("update instructor set salary = salary*1.05;");
-            System.out.println("\n********Salaries updated*******\n");
+            //stmt.executeUpdate("update instructor set salary = salary*1.05;");
+            //System.out.println("\n********Salaries updated*******\n");
             
             //Execute a query - which will return a result set
-            rset = stmt.executeQuery("SELECT * from Instructor");
+            rset = stmt.executeQuery("SELECT * from Employees");
 
             //Iterate over the result set and process each tuple
             while (rset.next()) {
                     System.out.println(rset.getString(2) + "\t" + rset.getString("salary"));
             }
+            
+   
+            
+          
+            
             
             // Clean up
             rset.close();
