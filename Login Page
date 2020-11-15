@@ -61,7 +61,20 @@ public class customerLoginPage extends JFrame implements ActionListener {
             //Iterate over the result set and process each tuple
             while (rset.next()) {
                 System.out.println(rset.getString("Name") + "\t" + rset.getString("Date") + rset.getString("Time"));
+   
             }
+            
+            System.out.println("\n*********Show average salaries for employees********");
+            
+            String sql = "SELECT * FROM Employees WHERE rate > (SELECT AVG(rate) FROM Employees)";
+
+			rset = stmt.executeQuery(sql);
+		
+			while (rset.next()) {
+
+				System.out.println(rset.getString("Employee_Name") + "\t" + rset.getString("rate"));
+            
+            
             
             System.out.println("\n********Update Employees Rate*******\n");
             
@@ -82,14 +95,19 @@ public class customerLoginPage extends JFrame implements ActionListener {
             // Clean up
             
             rset.close();
-            stmt.close();
+            stmt.close(); 
+            
+		}
+        }
+        
+			
             
             // Normally, you would close the connection when done
             // The connection is being left open in this example 
             // so that it does not have to re-established 
             //conn.close(); 
 
-        }
+        
         catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
             System.out.println("SQLState:     " + e.getSQLState());
