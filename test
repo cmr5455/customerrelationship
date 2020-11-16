@@ -1,0 +1,32 @@
+private static void call_stored_function(Connection conn) {
+        try {
+            Scanner c = new Scanner(System.in);
+            
+            System.out.println("Stored procedure demo..");
+
+            System.out.println("Enter your salary: ");
+            int p_salary = Integer.parseInt(c.nextLine());
+            System.out.println("Salary = "+p_salary);
+            
+            CallableStatement cs = conn.prepareCall("{call EmployeesLevel(?)}");
+            
+            cs.setInt(1, p_salary); //note that threshold is declared as an int
+            cs.registerOutParameter(1, Types.INTEGER);
+            
+            //Execute the query associated with the callable statement
+            cs.executeQuery();
+            
+            //Retrieve the result which is associated with the second 
+            //parameter (the out parameter)
+            int level_of_salary = cs.getInt(1);
+                        
+            System.out.println("Salary Level of "+p_salary
+              +"is in the "+level_of_salary);
+        }
+        catch (SQLException e) {
+                System.out.println("SQLException: " + e.getMessage());
+                System.out.println("SQLState:     " + e.getSQLState());
+                System.out.println("VendorError:  " + e.getErrorCode());
+            }
+    }
+    
