@@ -32,15 +32,14 @@ public class Login extends JFrame implements ActionListener {
    @Override
    public void actionPerformed(ActionEvent ae) {
       if (ae.getSource() == makeAppointment) {
-    	  
+    	  new MApp();
       }
       if (ae.getSource() == viewAppointment) {
-    	  
+    	  new VMapp();
       }
       if (ae.getSource() == logout) {
     	  //quick fix
     	  dispose();
-    	  new customerLoginPage().setVisible(true);
       }
 
    }
