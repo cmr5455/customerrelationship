@@ -58,21 +58,19 @@ public class customerLoginPage extends JFrame implements ActionListener {
             ResultSet rset = stmt.executeQuery("SELECT * from Services, Reservations"); 
             //Iterate over the result set and process each tuple
             while (rset.next()) {
-                System.out.println("Service Types: "+rset.getString("Name")+" |   " + " Date: " + rset.getString("Date") +" |  "+" Time: "+rset.getString("Time"));
-   
+                System.out.println("Service Types: "+rset.getString("Name")+" |   " + " Date: " + rset.getString("Date") +" |  "+" Time: "+rset.getString("Time"));  
             }
             
-            System.out.println("\n*********Show average salaries for employees********");
             
+            System.out.println("\n*********Show average salaries for employees********");
             String sql = "SELECT * FROM Employees WHERE rate < (SELECT AVG(rate) FROM Employees)";
-
-			rset = stmt.executeQuery(sql);
-		
+			rset = stmt.executeQuery(sql);		
 			while (rset.next()) {
-
 				System.out.println("People with lower salaries than the average: " + "\t" 
 				+ rset.getString("Employee_Name") + "\t" + rset.getString("rate"));
 			}
+			
+			
             System.out.println("\n********Update Employees Rate*******\n");           
             rset = stmt.executeQuery("SELECT * from Employees"); 
             //Iterate over the result set and process each tuple
@@ -84,19 +82,22 @@ public class customerLoginPage extends JFrame implements ActionListener {
             stmt.executeUpdate("update Employees set Rate = Rate*1.05");
             rset = stmt.executeQuery("SELECT * from Employees");
             while (rset.next()) {
-            	System.out.println("Employees Name: "+rset.getString("Employee_Name") + " Employees Rate: " + rset.getString("Rate") +" Employees Hours: "+ rset.getString("Hours")+"Employees Phone Number: " +rset.getString("Phone_Number")+" Employees Street: "+rset.getString("Street")+" Employees ZIP: "+rset.getString("Zip"));            }
-            // Clean up
+            	System.out.println("Employees Name: "+rset.getString("Employee_Name") + " Employees Rate: " + rset.getString("Rate") +" Employees Hours: "+ rset.getString("Hours")+" Employees Phone Number: " +rset.getString("Phone_Number")+" Employees Street: "+rset.getString("Street")+" Employees ZIP: "+rset.getString("Zip"));            }
+
             
+            System.out.println("\n********SubQueries*******\n");
+            sql = "SELECT COUNT(Employee_ID) FROM Employees WHERE Employee_ID IN (SELECT Employee_ID FROM Reservations WHERE Date = '2020-10-17')";
+			rset = stmt.executeQuery(sql);		
+			while (rset.next()) {
+				System.out.println("How many people working: "+rset.getString("COUNT(Employee_ID)"));
+			}          
             rset.close();
-            stmt.close(); 
-            
+            stmt.close();           
         }
             // Normally, you would close the connection when done
             // The connection is being left open in this example 
             // so that it does not have to re-established 
-            //conn.close(); 
-
-        
+            //conn.close();         
         catch (SQLException e) {
             System.out.println("SQLException: " + e.getMessage());
             System.out.println("SQLState:     " + e.getSQLState());
@@ -119,9 +120,7 @@ public class customerLoginPage extends JFrame implements ActionListener {
             System.out.println("SQLException: " + e.getMessage());
             System.out.println("SQLState:     " + e.getSQLState());
             System.out.println("VendorError:  " + e.getErrorCode());
-        }
-        
-    	
+        }            	
     }
     private static void prepared_statement(Connection conn) {
         try {
@@ -180,7 +179,7 @@ public class customerLoginPage extends JFrame implements ActionListener {
             //parameter (the out parameter)
             int productCount = cs.getInt(2);
                         
-            System.out.println("Number of products with price > "+threshold
+            System.out.println("Number of Services with price > "+threshold
               +" = "+productCount);
         }
         catch (SQLException e) {
@@ -189,13 +188,38 @@ public class customerLoginPage extends JFrame implements ActionListener {
                 System.out.println("VendorError:  " + e.getErrorCode());
             }
     }
+
+    private static void call_stored_function(Connection conn) {
+    	try {
+            Scanner c = new Scanner(System.in);
+            System.out.println("Stored function demo..");
+            Statement stmt = conn.createStatement();
+            ResultSet rset = stmt.executeQuery("SELECT * from Employees");
+            CallableStatement cs = conn.prepareCall("{call EmployeesLevel(?)}");
+            cs.setDouble(rset.getString("Rate"), 1);
+            cs.executeQuery();
+            rset = stmt.executeQuery("SELECT * from Employees");
+            while (rset.next()) {
+                System.out.println("Employees Name: "+rset.getString("Employee_ID") +" Employees Rate: $"+ rset.getString("Rate")+ " Name: "+rset.getString("Employee_Name")+" Hours: "+rset.getString("Hours")+" Phone Number: "+rset.getString("Phone_Number") +" Street: "+ rset.getString("Street")+" Zip: "+rset.getString("Zip")+" Employees Level: "+ rset.getString("EmployeesLevel(p_salary)"));
+            } 
+            rset.close();
+            stmt.close();
+        }
+        catch (SQLException e) {
+                System.out.println("SQLException: " + e.getMessage());
+                System.out.println("SQLState:     " + e.getSQLState());
+                System.out.println("VendorError:  " + e.getErrorCode());
+            }
+    	
+    }
     private static int get_option() {
         System.out.println("Choose option 1..4");
         System.out.println("\t1. Use database");
         System.out.println("\t2. Prepared statement");
         System.out.println("\t3. Stored Procedure");
         System.out.println("\t4. View");
-        System.out.println("\t5. Exit");
+        System.out.println("\t5. Stored Function");
+        System.out.println("\t6. Exit");
         
         Scanner s = new Scanner(System.in);
         return s.nextInt();
@@ -305,6 +329,8 @@ public class customerLoginPage extends JFrame implements ActionListener {
                 	view(conn);
                 	break;
                 case 5:
+                	call_stored_function(conn);
+                case 6:
                     System.exit(0);
                     break;
             }
