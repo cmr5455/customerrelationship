@@ -189,31 +189,18 @@ public class customerLoginPage extends JFrame implements ActionListener {
     private static void call_stored_function(Connection conn) {
         try {
             Scanner c = new Scanner(System.in);
-
+            System.out.println("Enter Reservation ID: ");
+            String userInput = c.nextLine();
             System.out.println("Stored function demo..");
-            Statement stmt = conn.createStatement();
-            ResultSet rset = stmt.executeQuery("SELECT * from Employees");  
-//            System.out.println("Enter your salary: ");
-//            int p_salary = Integer.parseInt(c.nextLine());
-            
-            System.out.println("Salary = "+rset.getString("Rate"));
 
             CallableStatement cs = conn.prepareCall("{? = call EmployeesLevel(?)}");
-
-            cs.setInt(rset.getString("Rate"), 1); 
-            cs.registerOutParameter(1, Types.VARCHAR);
-
-            //Execute the query associated with the callable statement
-            cs.executeQuery();
-
-            //Retrieve the result which is associated with the second 
-            //parameter (the out parameter)
-            String level_of_salary = cs.getString(1);
-
-            System.out.println("Salary Level of "+rset.getString("Rate")
-              +"is in the "+level_of_salary);
-            rset.close();
-            stmt.close();
+            
+            cs.registerOutParameter(1, Types.DATE);
+            cs.setString(2, userInput);
+            cs.execute();
+           
+            System.out.println("The Date of the Appointment "+ cs.getDate(1));
+            
         }
         catch (SQLException e) {
                 System.out.println("SQLException: " + e.getMessage());
