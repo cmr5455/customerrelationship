@@ -1,32 +1,50 @@
-private static void call_stored_function(Connection conn) {
-        try {
-            Scanner c = new Scanner(System.in);
-            
-            System.out.println("Stored procedure demo..");
-
-            System.out.println("Enter your salary: ");
-            int p_salary = Integer.parseInt(c.nextLine());
-            System.out.println("Salary = "+p_salary);
-            
-            CallableStatement cs = conn.prepareCall("{call EmployeesLevel(?)}");
-            
-            cs.setInt(1, p_salary); //note that threshold is declared as an int
-            cs.registerOutParameter(1, Types.INTEGER);
-            
-            //Execute the query associated with the callable statement
-            cs.executeQuery();
-            
-            //Retrieve the result which is associated with the second 
-            //parameter (the out parameter)
-            int level_of_salary = cs.getInt(1);
-                        
-            System.out.println("Salary Level of "+p_salary
-              +"is in the "+level_of_salary);
-        }
-        catch (SQLException e) {
-                System.out.println("SQLException: " + e.getMessage());
-                System.out.println("SQLState:     " + e.getSQLState());
-                System.out.println("VendorError:  " + e.getErrorCode());
-            }
-    }
-    
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+public class Login extends JFrame implements ActionListener {
+   JPanel panel;
+   JLabel user_label, password_label, message;
+   JTextField userName_text;
+   JPasswordField password_text;
+   JButton submit, cancel;
+   Login() {
+      // Username Label
+      user_label = new JLabel();
+      user_label.setText("User Name :");
+      userName_text = new JTextField();
+      // Password Label
+      password_label = new JLabel();
+      password_label.setText("Password :");
+      password_text = new JPasswordField();
+      // Submit
+      submit = new JButton("SUBMIT");
+      panel = new JPanel(new GridLayout(3, 1));
+      panel.add(user_label);
+      panel.add(userName_text);
+      panel.add(password_label);
+      panel.add(password_text);
+      message = new JLabel();
+      panel.add(message);
+      panel.add(submit);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      // Adding the listeners to components..
+      submit.addActionListener(this);
+      add(panel, BorderLayout.CENTER);
+      setTitle("Please Login Here !");
+      setSize(450,350);
+      setVisible(true);
+   }
+   public static void main(String[] args) {
+      new Login();
+   }
+   @Override
+   public void actionPerformed(ActionEvent ae) {
+      String userName = userName_text.getText();
+      String password = password_text.getText();
+      if (userName.trim().equals("admin") && password.trim().equals("admin")) {
+         message.setText(" Hello " + userName + "");
+      } else {
+         message.setText(" Invalid user.. ");
+      }
+   }
+}
