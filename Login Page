@@ -56,11 +56,9 @@ public class customerLoginPage extends JFrame implements ActionListener {
           //Execute a query - which will return a result set
             System.out.println("\n********Show Service Appointment*******\n");
             ResultSet rset = stmt.executeQuery("SELECT * from Services, Reservations"); 
-            System.out.println("Service Types    |    Date    |   Time");
-
             //Iterate over the result set and process each tuple
             while (rset.next()) {
-                System.out.println(rset.getString("Name") + "\t" + rset.getString("Date") + rset.getString("Time"));
+                System.out.println("Service Types: "+rset.getString("Name")+" |   " + " Date: " + rset.getString("Date") +" |  "+" Time: "+rset.getString("Time"));
    
             }
             
@@ -74,34 +72,25 @@ public class customerLoginPage extends JFrame implements ActionListener {
 
 				System.out.println("People with lower salaries than the average: " + "\t" 
 				+ rset.getString("Employee_Name") + "\t" + rset.getString("rate"));
-            
-            
-            
-            System.out.println("\n********Update Employees Rate*******\n");
-            
-            System.out.println("Enter update percent raise for Rate update: ");
-            String rate = c.readLine();
+			}
+            System.out.println("\n********Update Employees Rate*******\n");           
             rset = stmt.executeQuery("SELECT * from Employees"); 
             //Iterate over the result set and process each tuple
             System.out.println("\n********Before Update*******\n");
             while (rset.next()) {
-                System.out.println(rset.getString("Employee_Name") + "\t" + rset.getString("Rate") + rset.getString("Hours")+rset.getString("Phone_Number")+rset.getString("Street")+rset.getString("Zip"));
+                System.out.println("Employees Name: "+rset.getString("Employee_Name") + " Employees Rate: " + rset.getString("Rate") +" Employees Hours: "+ rset.getString("Hours")+" Employees Phone Number: " +rset.getString("Phone_Number")+" Employees Street: "+rset.getString("Street")+" Employees ZIP: "+rset.getString("Zip"));
             }
             System.out.println("\n********After Update*******\n");
-            stmt.executeUpdate("update Employees set Rate = Rate*1.05;");
+            stmt.executeUpdate("update Employees set Rate = Rate*1.05");
             rset = stmt.executeQuery("SELECT * from Employees");
             while (rset.next()) {
-                System.out.println(rset.getString("Employee_Name") + "\t" + rset.getString("Rate") + rset.getString("Hours")+rset.getString("Phone_Number")+rset.getString("Street")+rset.getString("Zip"));
-            }
+            	System.out.println("Employees Name: "+rset.getString("Employee_Name") + " Employees Rate: " + rset.getString("Rate") +" Employees Hours: "+ rset.getString("Hours")+"Employees Phone Number: " +rset.getString("Phone_Number")+" Employees Street: "+rset.getString("Street")+" Employees ZIP: "+rset.getString("Zip"));            }
             // Clean up
             
             rset.close();
             stmt.close(); 
             
-		}
         }
-        
-	
             // Normally, you would close the connection when done
             // The connection is being left open in this example 
             // so that it does not have to re-established 
@@ -120,10 +109,8 @@ public class customerLoginPage extends JFrame implements ActionListener {
             System.out.println("Service Listing Option");
             Statement stmt = conn.createStatement();
             ResultSet rset = stmt.executeQuery("SELECT * from Services");  
-            System.out.println("Service Types | Price | Minutes");
-
             while (rset.next()) {
-                System.out.println(rset.getString(2) + "\t" + rset.getString(3)+"\t"+rset.getString(4));
+                System.out.println("Service Types: " + rset.getString(2) + " Price: " + rset.getString(3)+" Minutes: "+rset.getString(4));
             }
             rset.close();
             stmt.close();
@@ -149,7 +136,6 @@ public class customerLoginPage extends JFrame implements ActionListener {
             System.out.println("Enter what kind of appointment you would like to book: ");
             String name = c.readLine();
             
-            //Say user enters this:  Einstein' or 'Y' = 'Y  ,exactly as shown
             
             PreparedStatement pStmt = conn.prepareStatement(
             "select * from Services where Name = ?");
@@ -163,7 +149,7 @@ public class customerLoginPage extends JFrame implements ActionListener {
                         
             //Iterate over the result set and process each tuple
             while (rset.next()) {
-                    System.out.println(rset.getString("Name"));
+                    System.out.println("Service Name: "+rset.getString("Name") +" Cost: $"+ rset.getString("Price")+ " Time: "+rset.getString("TimeinMinutes"));
                 }
             }
         catch (SQLException e) {
