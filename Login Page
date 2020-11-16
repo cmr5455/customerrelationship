@@ -264,6 +264,7 @@ public class customerLoginPage extends JFrame implements ActionListener {
 				boolean result = Login(userText,pwdText);
 				if (result == true) {
 	                JOptionPane.showMessageDialog(this, "Welcome");
+			dispose();
 	                new Login();
 	            } else {
 	            	
