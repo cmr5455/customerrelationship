@@ -13,8 +13,6 @@ import javax.swing.JTextField;
 import java.sql.*;
 import java.io.Console;
 import java.util.Scanner;
-
-
  
 public class customerLoginPage extends JFrame implements ActionListener {
     Container container = getContentPane();
@@ -25,6 +23,8 @@ public class customerLoginPage extends JFrame implements ActionListener {
     JButton loginButton = new JButton("LOGIN");
     JButton resetButton = new JButton("CLEAR");
     JCheckBox showPassword = new JCheckBox("Show Password");
+    static Statement stmt;
+    static Connection conn;
     customerLoginPage() {
         setLayoutManager();
         setLocationAndSize();
@@ -76,20 +76,20 @@ public class customerLoginPage extends JFrame implements ActionListener {
             //Iterate over the result set and process each tuple
             System.out.println("\n********Before Update*******\n");
             while (rset.next()) {
-                System.out.println("Employees Name: "+rset.getString("Employee_Name") + "|     Employees Rate: " + rset.getString("Rate") +"|       Employees Hours: "+ rset.getString("Hours")+"|       Employees Phone Number: " +rset.getString("Phone_Number")+"|       Employees Street: "+rset.getString("Street")+"|      Employees ZIP: "+rset.getString("Zip"));
+                System.out.println("Employees Name: "+rset.getString("Employee_Name") + " Employees Rate: " + rset.getString("Rate") +" Employees Hours: "+ rset.getString("Hours")+" Employees Phone Number: " +rset.getString("Phone_Number")+" Employees Street: "+rset.getString("Street")+" Employees ZIP: "+rset.getString("Zip"));
             }
             System.out.println("\n********After Update*******\n");
             stmt.executeUpdate("update Employees set Rate = Rate*1.05");
             rset = stmt.executeQuery("SELECT * from Employees");
             while (rset.next()) {
-            	System.out.println("Employees Name: "+rset.getString("Employee_Name") + "|      Employees Rate: " + rset.getString("Rate") +"|      Employees Hours: "+ rset.getString("Hours")+"|       Employees Phone Number: " +rset.getString("Phone_Number")+"|       Employees Street: "+rset.getString("Street")+"|      Employees ZIP: "+rset.getString("Zip"));            }
+            	System.out.println("Employees Name: "+rset.getString("Employee_Name") + " Employees Rate: " + rset.getString("Rate") +" Employees Hours: "+ rset.getString("Hours")+" Employees Phone Number: " +rset.getString("Phone_Number")+" Employees Street: "+rset.getString("Street")+" Employees ZIP: "+rset.getString("Zip"));            }
 
             
             System.out.println("\n********SubQueries*******\n");
             sql = "SELECT COUNT(Employee_ID) FROM Employees WHERE Employee_ID IN (SELECT Employee_ID FROM Reservations WHERE Date = '2020-10-17')";
 			rset = stmt.executeQuery(sql);		
 			while (rset.next()) {
-				System.out.println("How many people are working: "+rset.getString("COUNT(Employee_ID)"));
+				System.out.println("How many people working: "+rset.getString("COUNT(Employee_ID)"));
 			}          
             rset.close();
             stmt.close();           
@@ -111,7 +111,7 @@ public class customerLoginPage extends JFrame implements ActionListener {
             Statement stmt = conn.createStatement();
             ResultSet rset = stmt.executeQuery("SELECT * from Services");  
             while (rset.next()) {
-                System.out.println("Service Types: " + rset.getString(2) + "|      Price: " + rset.getString(3)+"|      Minutes: "+rset.getString(4));
+                System.out.println("Service Types: " + rset.getString(2) + " Price: " + rset.getString(3)+" Minutes: "+rset.getString(4));
             }
             rset.close();
             stmt.close();
@@ -148,7 +148,7 @@ public class customerLoginPage extends JFrame implements ActionListener {
                         
             //Iterate over the result set and process each tuple
             while (rset.next()) {
-                    System.out.println("Service Name: "+rset.getString("Name") +"|      Cost: $"+ rset.getString("Price")+ "|     Time: "+rset.getString("TimeinMinutes"));
+                    System.out.println("Service Name: "+rset.getString("Name") +" Cost: $"+ rset.getString("Price")+ " Time: "+rset.getString("TimeinMinutes"));
                 }
             }
         catch (SQLException e) {
@@ -246,7 +246,6 @@ public class customerLoginPage extends JFrame implements ActionListener {
         container.add(showPassword);
         container.add(loginButton);
         container.add(resetButton);
-        
     }
     public void addActionEvent() {
         loginButton.addActionListener(this);
@@ -260,22 +259,19 @@ public class customerLoginPage extends JFrame implements ActionListener {
             String userText;
             String pwdText;
             userText = userTextField.getText();
-            pwdText = passwordField.getText();
-            
-            
-            if (userText.equalsIgnoreCase("user") && pwdText.equalsIgnoreCase("1234")) {
-                JOptionPane.showMessageDialog(this, "Login Successful");
-                
-                new Login();
-                
-                
-            }
-                
-                
-             else {
-            	
-                JOptionPane.showMessageDialog(this, "Invalid Username or Password");
-            }
+            pwdText = passwordField.getText();                       
+            try {
+				boolean result = Login(userText,pwdText);
+				if (result == true) {
+	                JOptionPane.showMessageDialog(this, "Welcome");
+	                new Login();
+	            } else {
+	            	
+	                JOptionPane.showMessageDialog(this, "Invalid Username or Password");
+	            }
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
         }
         //Coding Part of RESET button
         if (e.getSource() == resetButton) {
@@ -290,13 +286,26 @@ public class customerLoginPage extends JFrame implements ActionListener {
                 passwordField.setEchoChar('*');
             }
  
-            
-        
+ 
         }
     }
+    public static void openDataBase(Connection conn) throws SQLException {
+    	  stmt = conn.createStatement();
+    }
     
-  
-    
+    public static void closeDataBase() throws SQLException {
+  	  stmt.close();
+    }
+    public static boolean Login(String userName,String password) throws SQLException {
+    	String sql = "SELECT * FROM Customers WHERE (Customer_ID = '"+userName+"' AND Password = '"+password+"')";
+    	ResultSet rset = stmt.executeQuery(sql);
+    	
+    	if (rset.next() == true) {
+    		return true;
+    	}else {
+    		return false;
+    	}
+      }
     public static void main(String[] args) {
     	customerLoginPage frame = new customerLoginPage();
         frame.setTitle("Please Login Here!");
@@ -306,49 +315,43 @@ public class customerLoginPage extends JFrame implements ActionListener {
         frame.setResizable(false);
         
         Console c = System.console();
-        String database_name, username;
-		char[] password;
+        String database_name ="";// Add your database name here
+        String username = "";//Add your database username here
         
-        //read user name, database name, and password, if not specified on command line
-        if (args.length > 0) {
-            database_name = args[0];
-            username = args[0]; 
-        }
-        else {
-            database_name = c.readLine("Database name? ");
-            username = c.readLine("User Name? ");
-        }
         
-        	password = c.readPassword("Password? ");
-        
+        String password = "";//Add your password here
 
-
-        Connection conn = establish_connection(database_name, username, new String(password));
+         conn = establish_connection(database_name, username, password);
+         try {
+			openDataBase(conn);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+         
         
-    
-        
-        while (true) {
-            int option = get_option();
-            switch (option) {
-                case 1:
-                    use_database(conn);
-                    break;
-                case 2:
-                    prepared_statement(conn);
-                    break;
-                case 3:
-                    call_stored_procedure(conn);
-                    break;
-                case 4:
-                	view(conn);
-                	break;
-                case 5:
-                	call_stored_function(conn);
-                case 6:
-                    System.exit(0);
-                    break;
-            }
-        }
+//        while (true) {
+//            int option = get_option();
+//            switch (option) {
+//                case 1:
+//                    use_database(conn);
+//                    break;
+//                case 2:
+//                    prepared_statement(conn);
+//                    break;
+//                case 3:
+//                    call_stored_procedure(conn);
+//                    break;
+//                case 4:
+//                	view(conn);
+//                	break;
+//                case 5:
+//                	call_stored_function(conn);
+//                case 6:
+//                    System.exit(0);
+//                    break;
+//            }
+//        }
  
     }
 }
