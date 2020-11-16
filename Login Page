@@ -13,6 +13,8 @@ import javax.swing.JTextField;
 import java.sql.*;
 import java.io.Console;
 import java.util.Scanner;
+
+
  
 public class customerLoginPage extends JFrame implements ActionListener {
     Container container = getContentPane();
@@ -244,6 +246,7 @@ public class customerLoginPage extends JFrame implements ActionListener {
         container.add(showPassword);
         container.add(loginButton);
         container.add(resetButton);
+        
     }
     public void addActionEvent() {
         loginButton.addActionListener(this);
@@ -263,7 +266,13 @@ public class customerLoginPage extends JFrame implements ActionListener {
             if (userText.equalsIgnoreCase("user") && pwdText.equalsIgnoreCase("1234")) {
                 JOptionPane.showMessageDialog(this, "Login Successful");
                 
-            } else {
+                new Login();
+                
+                
+            }
+                
+                
+             else {
             	
                 JOptionPane.showMessageDialog(this, "Invalid Username or Password");
             }
@@ -281,7 +290,8 @@ public class customerLoginPage extends JFrame implements ActionListener {
                 passwordField.setEchoChar('*');
             }
  
- 
+            
+        
         }
     }
     
