@@ -74,20 +74,20 @@ public class customerLoginPage extends JFrame implements ActionListener {
             //Iterate over the result set and process each tuple
             System.out.println("\n********Before Update*******\n");
             while (rset.next()) {
-                System.out.println("Employees Name: "+rset.getString("Employee_Name") + " Employees Rate: " + rset.getString("Rate") +" Employees Hours: "+ rset.getString("Hours")+" Employees Phone Number: " +rset.getString("Phone_Number")+" Employees Street: "+rset.getString("Street")+" Employees ZIP: "+rset.getString("Zip"));
+                System.out.println("Employees Name: "+rset.getString("Employee_Name") + "|     Employees Rate: " + rset.getString("Rate") +"|       Employees Hours: "+ rset.getString("Hours")+"|       Employees Phone Number: " +rset.getString("Phone_Number")+"|       Employees Street: "+rset.getString("Street")+"|      Employees ZIP: "+rset.getString("Zip"));
             }
             System.out.println("\n********After Update*******\n");
             stmt.executeUpdate("update Employees set Rate = Rate*1.05");
             rset = stmt.executeQuery("SELECT * from Employees");
             while (rset.next()) {
-            	System.out.println("Employees Name: "+rset.getString("Employee_Name") + " Employees Rate: " + rset.getString("Rate") +" Employees Hours: "+ rset.getString("Hours")+" Employees Phone Number: " +rset.getString("Phone_Number")+" Employees Street: "+rset.getString("Street")+" Employees ZIP: "+rset.getString("Zip"));            }
+            	System.out.println("Employees Name: "+rset.getString("Employee_Name") + "|      Employees Rate: " + rset.getString("Rate") +"|      Employees Hours: "+ rset.getString("Hours")+"|       Employees Phone Number: " +rset.getString("Phone_Number")+"|       Employees Street: "+rset.getString("Street")+"|      Employees ZIP: "+rset.getString("Zip"));            }
 
             
             System.out.println("\n********SubQueries*******\n");
             sql = "SELECT COUNT(Employee_ID) FROM Employees WHERE Employee_ID IN (SELECT Employee_ID FROM Reservations WHERE Date = '2020-10-17')";
 			rset = stmt.executeQuery(sql);		
 			while (rset.next()) {
-				System.out.println("How many people working: "+rset.getString("COUNT(Employee_ID)"));
+				System.out.println("How many people are working: "+rset.getString("COUNT(Employee_ID)"));
 			}          
             rset.close();
             stmt.close();           
@@ -109,7 +109,7 @@ public class customerLoginPage extends JFrame implements ActionListener {
             Statement stmt = conn.createStatement();
             ResultSet rset = stmt.executeQuery("SELECT * from Services");  
             while (rset.next()) {
-                System.out.println("Service Types: " + rset.getString(2) + " Price: " + rset.getString(3)+" Minutes: "+rset.getString(4));
+                System.out.println("Service Types: " + rset.getString(2) + "|      Price: " + rset.getString(3)+"|      Minutes: "+rset.getString(4));
             }
             rset.close();
             stmt.close();
@@ -146,7 +146,7 @@ public class customerLoginPage extends JFrame implements ActionListener {
                         
             //Iterate over the result set and process each tuple
             while (rset.next()) {
-                    System.out.println("Service Name: "+rset.getString("Name") +" Cost: $"+ rset.getString("Price")+ " Time: "+rset.getString("TimeinMinutes"));
+                    System.out.println("Service Name: "+rset.getString("Name") +"|      Cost: $"+ rset.getString("Price")+ "|     Time: "+rset.getString("TimeinMinutes"));
                 }
             }
         catch (SQLException e) {
@@ -284,6 +284,9 @@ public class customerLoginPage extends JFrame implements ActionListener {
  
         }
     }
+    
+  
+    
     public static void main(String[] args) {
     	customerLoginPage frame = new customerLoginPage();
         frame.setTitle("Please Login Here!");
@@ -294,6 +297,7 @@ public class customerLoginPage extends JFrame implements ActionListener {
         
         Console c = System.console();
         String database_name, username;
+		char[] password;
         
         //read user name, database name, and password, if not specified on command line
         if (args.length > 0) {
@@ -305,9 +309,13 @@ public class customerLoginPage extends JFrame implements ActionListener {
             username = c.readLine("User Name? ");
         }
         
-        char [] password = c.readPassword("Password? ");
+        	password = c.readPassword("Password? ");
+        
+
 
         Connection conn = establish_connection(database_name, username, new String(password));
+        
+    
         
         while (true) {
             int option = get_option();
