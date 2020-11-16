@@ -44,8 +44,7 @@ public class customerLoginPage extends JFrame implements ActionListener {
             System.out.println("SQLException: " + e.getMessage());
             System.out.println("SQLState:     " + e.getSQLState());
             System.out.println("VendorError:  " + e.getErrorCode());
-        }
-        
+        }       
         return conn;
     }
     private static void use_database(Connection conn) {
@@ -69,8 +68,7 @@ public class customerLoginPage extends JFrame implements ActionListener {
 				System.out.println("People with lower salaries than the average: " + "\t" 
 				+ rset.getString("Employee_Name") + "\t" + rset.getString("rate"));
 			}
-			
-			
+						
             System.out.println("\n********Update Employees Rate*******\n");           
             rset = stmt.executeQuery("SELECT * from Employees"); 
             //Iterate over the result set and process each tuple
@@ -188,20 +186,32 @@ public class customerLoginPage extends JFrame implements ActionListener {
                 System.out.println("VendorError:  " + e.getErrorCode());
             }
     }
-
     private static void call_stored_function(Connection conn) {
-    	try {
+        try {
             Scanner c = new Scanner(System.in);
+
             System.out.println("Stored function demo..");
             Statement stmt = conn.createStatement();
-            ResultSet rset = stmt.executeQuery("SELECT * from Employees");
-            CallableStatement cs = conn.prepareCall("{call EmployeesLevel(?)}");
-            cs.setDouble(rset.getString("Rate"), 1);
+            ResultSet rset = stmt.executeQuery("SELECT * from Employees");  
+//            System.out.println("Enter your salary: ");
+//            int p_salary = Integer.parseInt(c.nextLine());
+            
+            System.out.println("Salary = "+rset.getString("Rate"));
+
+            CallableStatement cs = conn.prepareCall("{? = call EmployeesLevel(?)}");
+
+            cs.setInt(rset.getString("Rate"), 1); 
+            cs.registerOutParameter(1, Types.VARCHAR);
+
+            //Execute the query associated with the callable statement
             cs.executeQuery();
-            rset = stmt.executeQuery("SELECT * from Employees");
-            while (rset.next()) {
-                System.out.println("Employees Name: "+rset.getString("Employee_ID") +" Employees Rate: $"+ rset.getString("Rate")+ " Name: "+rset.getString("Employee_Name")+" Hours: "+rset.getString("Hours")+" Phone Number: "+rset.getString("Phone_Number") +" Street: "+ rset.getString("Street")+" Zip: "+rset.getString("Zip")+" Employees Level: "+ rset.getString("EmployeesLevel(p_salary)"));
-            } 
+
+            //Retrieve the result which is associated with the second 
+            //parameter (the out parameter)
+            String level_of_salary = cs.getString(1);
+
+            System.out.println("Salary Level of "+rset.getString("Rate")
+              +"is in the "+level_of_salary);
             rset.close();
             stmt.close();
         }
@@ -210,7 +220,6 @@ public class customerLoginPage extends JFrame implements ActionListener {
                 System.out.println("SQLState:     " + e.getSQLState());
                 System.out.println("VendorError:  " + e.getErrorCode());
             }
-    	
     }
     private static int get_option() {
         System.out.println("Choose option 1..4");
