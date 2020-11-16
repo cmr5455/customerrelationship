@@ -3,23 +3,21 @@ import java.awt.event.*;
 import javax.swing.*;
 public class Login extends JFrame implements ActionListener {
    JPanel panel;
-   JButton  makeAppointment,viewAppointment,logout,cancel;
+   JButton  makeAppointment,viewAppointment,logout;
    Login() {
       // make appointment
       makeAppointment = new JButton("Make An Appointment");
       //view appointment
       viewAppointment = new JButton("View Appointment(s)");
-      // logout Label
+      // logout
       logout = new JButton("Logout");
-      // cancel
-      cancel = new JButton("CANCEL");
+      //panel additions
       panel = new JPanel(new GridLayout(3, 1));
       panel.add(makeAppointment);
+      panel.add(viewAppointment);
       panel.add(logout);
-      panel.add(cancel);
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       // Adding the listeners to components..
-      cancel.addActionListener(this);
       makeAppointment.addActionListener(this);
       viewAppointment.addActionListener(this);
       logout.addActionListener(this);
@@ -40,10 +38,10 @@ public class Login extends JFrame implements ActionListener {
     	  
       }
       if (ae.getSource() == logout) {
-    	  
+    	  //quick fix
+    	  dispose();
+    	  new customerLoginPage().setVisible(true);
       }
-      if (ae.getSource() == cancel) {
-    	  
-      }
+
    }
 }
